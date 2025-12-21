@@ -7,6 +7,15 @@ metadata:
 # Flip this back on, we're going to be a larger system
 recommends: true
 
+repos:
+  - fedora
+  #- sway
+  - copr:copr.fedorainfracloud.org:eyecantcu:supergfxctl
+  - copr:copr.fedorainfracloud.org:pgaskin:looking-glass-client
+  - copr:copr.fedorainfracloud.org:solopasha:hyprland
+  - copr:copr.fedorainfracloud.org:tofik:nwg-shell
+  - copr:copr.fedorainfracloud.org:wezfurlong:wezterm-nightly
+
 include:
   - ../minimal-plus/manifest.yaml
   - autoupdates.yaml
@@ -16,6 +25,7 @@ include:
   - persistent-journal.yaml
   - initramfs-full.yaml
   - generic-growfs.yaml
+  - tygrys20.yaml
 
 packages:
   # Include and set the default editor
@@ -63,8 +73,9 @@ packages-aarch64:
 # have recommends: false so these could only come in via
 # hard requirement, in which case the build will fail.
 exclude-packages:
-  - perl
-  - perl-interpreter
+  # - perl
+  # - perl-interpreter
+  # - plymouth
   - nodejs
   - grubby
   - cowsay # Just in case
@@ -73,7 +84,6 @@ exclude-packages:
   - initscripts
   # For (datacenter/cloud oriented) servers, we want to see the details by default.
   # https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/HSMISZ3ETWQ4ETVLWZQJ55ARZT27AAV3/
-  - plymouth
   # Do not use legacy ifcfg config format in NetworkManager
   # See https://github.com/coreos/fedora-coreos-config/pull/1991
   - NetworkManager-initscripts-ifcfg-rh

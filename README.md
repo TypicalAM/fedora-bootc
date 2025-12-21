@@ -2,6 +2,19 @@
 
 Create and maintain base *bootable* container images from Fedora packages.
 
+# How to run
+
+This is my mod of the build files to use as my own image base with the most important packages. Look for usage in https://github.com/TypicalAM/tygrys20:
+
+```
+podman build -f Containerfile --no-cache -t localhost/fedora-bootc:minimal --security-opt=label=disable --cap-add=all --device /dev/fuse --build-arg=manifest=fedora-minimal .
+
+rpm-ostree compose build-chunked-oci \
+	--from localhost/fedora-bootc:minimal \
+	--bootc \
+	--output containers-storage:docker.io/typicalam/fedora-bootc:43
+```
+
 ## Motivation
 
 The original Docker container model of using "layers" to model applications has

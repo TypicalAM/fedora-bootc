@@ -12,9 +12,10 @@
 #
 # Note we also support --build-arg REPOS_IMAGE=quay.io/fedora/fedora:41 here
 # since konflux doesn't yet support --from.
-ARG REPOS_IMAGE=quay.io/fedora/fedora:rawhide
-ARG BUILDER_IMAGE=quay.io/fedora/fedora:rawhide
+ARG REPOS_IMAGE=quay.io/fedora/fedora:43
+ARG BUILDER_IMAGE=quay.io/fedora/fedora:43
 FROM $REPOS_IMAGE as repos
+COPY repos/* /etc/yum.repos.d
 
 # BOOTSTRAPPING: This can be any image that has rpm-ostree, selinux-policy-targeted
 #                and python3 (for bootc-base-imagectl).
