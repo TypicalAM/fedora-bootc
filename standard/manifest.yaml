@@ -9,7 +9,13 @@ recommends: true
 
 repos:
   - fedora
-  #- sway
+  - rpmfusion-free
+  - rpmfusion-free-updates
+  - rpmfusion-nonfree-nvidia-driver
+  - rpmfusion-nonfree
+  - rpmfusion-nonfree-steam
+  - rpmfusion-nonfree-updates
+  - copr:copr.fedorainfracloud.org:erikreider:SwayNotificationCenter
   - copr:copr.fedorainfracloud.org:eyecantcu:supergfxctl
   - copr:copr.fedorainfracloud.org:pgaskin:looking-glass-client
   - copr:copr.fedorainfracloud.org:solopasha:hyprland

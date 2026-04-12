@@ -1,4 +1,4 @@
-[sway]
+[copr:copr.fedorainfracloud.org:erikreider:SwayNotificationCenter]
 name=Copr repo for SwayNotificationCenter owned by erikreider
 baseurl=https://download.copr.fedorainfracloud.org/results/erikreider/SwayNotificationCenter/fedora-$releasever-$basearch/
 type=rpm-md

@@ -1,4 +1,7 @@
 packages:
+  - steam
+  - ffmpeg
+  - obs-studio-plugin-x264
   - iwlegacy-firmware
   - iwlwifi-dvm-firmware
   - iwlwifi-mld-firmware
