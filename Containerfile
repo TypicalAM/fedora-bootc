@@ -2,18 +2,23 @@
 # nested containerization, so you must build with e.g.
 # podman build --security-opt=label=disable --cap-add=all --device /dev/fuse <...>
 
-# NOTE: This container build will output a single giant layer. It is strongly recommended
-# to run the "rechunker" on the output of this build, see
-# https://coreos.github.io/rpm-ostree/experimental-build-chunked-oci/
+# NOTE: This container build will output a single giant layer. You can either
+# run the "rechunker" on the output of this build (see bootc-base-imagectl.md),
+# or build the split version directly with `just build --chunkah`
+# (or if using podman/buildah directly, add `--build-arg FINAL=chunked
+# --skip-unused-stages=false -v $PWD:/run/src`).
 
 # Override this repos container to control the base image package versions. For
-# example, podman build --from=quay.io/fedora/fedora:41 will get you a system
-# that uses Fedora 41 packages. Or inject arbitrary yum repos (COPR, etc) here.
+# example, podman build --from=quay.io/fedora/fedora:44 will get you a system
+# that uses Fedora 44 packages. Or inject arbitrary yum repos (COPR, etc) here.
 #
-# Note we also support --build-arg REPOS_IMAGE=quay.io/fedora/fedora:41 here
+# Note we also support --build-arg REPOS_IMAGE=quay.io/fedora/fedora:44 here
 # since konflux doesn't yet support --from.
-ARG REPOS_IMAGE=quay.io/fedora/fedora:43
-ARG BUILDER_IMAGE=quay.io/fedora/fedora:43
+ARG REPOS_IMAGE=quay.io/fedora/fedora:44
+ARG BUILDER_IMAGE=quay.io/fedora/fedora:44
+# Either 'unchunked' or 'chunked'. Determines whether we take the chunkah path.
+ARG FINAL=unchunked
+
 FROM $REPOS_IMAGE as repos
 COPY repos/* /etc/yum.repos.d
 
@@ -55,9 +60,19 @@ install -m 0755 -t /usr/libexec ./bootc-base-imagectl
 EORUN
 
 # This pulls in the rootfs generated in the previous step
-FROM scratch
+FROM scratch AS unchunked
 COPY --from=builder /target-rootfs/ /
 
+FROM builder AS rechunker
+RUN dnf -y install chunkah
+ARG CHUNKAH_ARGS=""
+RUN --mount=from=unchunked,src=/,target=/chunkah,ro \
+    --mount=type=bind,target=/run/src,rw \
+    /usr/libexec/bootc-base-imagectl rechunk --chunkah ${CHUNKAH_ARGS} \
+    > /run/src/out.ociarchive
+FROM oci-archive:out.ociarchive AS chunked
+
+FROM $FINAL
 LABEL containers.bootc 1
 # This is an ad-hoc way for us to reference bootc-image-builder in
 # a way that in theory client tooling can inspect and find. Today
