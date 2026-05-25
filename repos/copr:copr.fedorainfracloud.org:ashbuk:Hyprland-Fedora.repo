@@ -1,0 +1,10 @@
+[copr:copr.fedorainfracloud.org:ashbuk:Hyprland-Fedora]
+name=Copr repo for Hyprland-Fedora owned by ashbuk
+baseurl=https://download.copr.fedorainfracloud.org/results/ashbuk/Hyprland-Fedora/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/ashbuk/Hyprland-Fedora/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1

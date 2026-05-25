@@ -15,6 +15,7 @@ repos:
   - rpmfusion-nonfree
   - rpmfusion-nonfree-steam
   - rpmfusion-nonfree-updates
+  - copr:copr.fedorainfracloud.org:ashbuk:Hyprland-Fedora
   - copr:copr.fedorainfracloud.org:erikreider:SwayNotificationCenter
   - copr:copr.fedorainfracloud.org:eyecantcu:supergfxctl
   - copr:copr.fedorainfracloud.org:pgaskin:looking-glass-client
