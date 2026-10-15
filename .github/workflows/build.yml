@@ -44,7 +44,8 @@ jobs:
         # commit of this multi-GB rootfs crawl. We're root in a privileged
         # container, so kernel overlay works.
         run: |
-          sed -i '/^mount_program/d' /etc/containers/storage.conf
+          # fsync=0 in mountopt is fuse-overlayfs-only; the kernel rejects it
+          sed -i -e '/^mount_program/d' -e 's/^mountopt = .*/mountopt = "nodev"/' /etc/containers/storage.conf
           podman info --format '{{.Store.GraphDriverName}} {{.Store.GraphOptions}}'
 
       - name: Compute tags
