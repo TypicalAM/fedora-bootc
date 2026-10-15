@@ -39,6 +39,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Use native overlayfs
+        # The podman image defaults to fuse-overlayfs, which makes every layer
+        # commit of this multi-GB rootfs crawl. We're root in a privileged
+        # container, so kernel overlay works.
+        run: |
+          sed -i '/^mount_program/d' /etc/containers/storage.conf
+          podman info --format '{{.Store.GraphDriverName}} {{.Store.GraphOptions}}'
+
       - name: Compute tags
         id: meta
         run: |
