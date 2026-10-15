@@ -29,15 +29,14 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    # Ubuntu's podman 4.9 is too old for this Containerfile (rw bind mounts from
+    # stages, oci-archive FROM), so build with a current podman. /mnt has much
+    # more free space than / on hosted runners.
+    container:
+      image: quay.io/podman/stable:v5
+      options: --privileged -v /mnt/containers:/var/lib/containers
     timeout-minutes: 180
     steps:
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
-            /opt/hostedtoolcache/CodeQL /usr/local/share/boost
-          sudo docker image prune --all --force
-          df -h /
-
       - uses: actions/checkout@v4
 
       - name: Compute tags
@@ -51,7 +50,7 @@ jobs:
 
       - name: Build chunked image
         run: |
-          sudo podman build \
+          podman build \
             --security-opt=label=disable --cap-add=all --device /dev/fuse \
             --no-cache --pull=always \
             --build-arg MANIFEST="$MANIFEST" \
@@ -63,16 +62,16 @@ jobs:
             .
 
       - name: Lint image
-        run: sudo podman run --rm "$IMAGE:${{ steps.meta.outputs.version }}" bootc container lint
+        run: podman run --rm "$IMAGE:${{ steps.meta.outputs.version }}" bootc container lint
 
       - name: Push
         env:
           REGISTRY_USER: ${{ secrets.DOCKERHUB_USERNAME }}
           REGISTRY_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo "$REGISTRY_TOKEN" | sudo podman login docker.io -u "$REGISTRY_USER" --password-stdin
+          echo "$REGISTRY_TOKEN" | podman login docker.io -u "$REGISTRY_USER" --password-stdin
           for tag in "${{ steps.meta.outputs.version }}" \
                      "${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.date }}" \
                      latest; do
-            sudo podman push "$IMAGE:$tag"
+            podman push "$IMAGE:$tag"
           done
