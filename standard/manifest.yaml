@@ -19,7 +19,7 @@ repos:
   - copr:copr.fedorainfracloud.org:erikreider:SwayNotificationCenter
   - copr:copr.fedorainfracloud.org:eyecantcu:supergfxctl
   - copr:copr.fedorainfracloud.org:pgaskin:looking-glass-client
-  - copr:copr.fedorainfracloud.org:solopasha:hyprland
+  - copr:copr.fedorainfracloud.org:sdegler:hyprland
   - copr:copr.fedorainfracloud.org:tofik:nwg-shell
   - copr:copr.fedorainfracloud.org:wezfurlong:wezterm-nightly
 
