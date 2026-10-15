@@ -34,7 +34,9 @@ jobs:
     # more free space than / on hosted runners.
     container:
       image: quay.io/podman/stable:v5
-      options: --privileged -v /mnt/containers:/var/lib/containers
+      # /var/tmp too: buildah puts overlay upperdirs there, which the kernel
+      # refuses on top of the job container's own overlayfs root.
+      options: --privileged -v /mnt/containers:/var/lib/containers -v /mnt/tmp:/var/tmp
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
