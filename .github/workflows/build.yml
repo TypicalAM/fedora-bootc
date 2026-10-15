@@ -67,7 +67,7 @@ jobs:
       - name: Push
         env:
           REGISTRY_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-          REGISTRY_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          REGISTRY_TOKEN: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
           echo "$REGISTRY_TOKEN" | podman login docker.io -u "$REGISTRY_USER" --password-stdin
           for tag in "${{ steps.meta.outputs.version }}" \
