@@ -88,11 +88,24 @@ jobs:
             -t "$IMAGE:latest" \
             .
 
-      - name: RPM cache size after build
+      - name: Prune RPM cache
+        # Drop RPMs the image no longer contains so superseded versions don't
+        # pile up in the cache month after month.
         run: |
-          du -sh /var/tmp/buildah-cache-0
-          find /var/tmp/buildah-cache-0 -maxdepth 4 -type d | head -40
-          find /var/tmp/buildah-cache-0 -name '*.rpm' | wc -l
+          podman run --rm "$IMAGE:${{ steps.meta.outputs.version }}" \
+            rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}.rpm\n' | sort > /tmp/keep
+          find /var/tmp/buildah-cache-0 -name '*.rpm' > /tmp/cached
+          # Guard against a naming mismatch wiping the whole cache
+          matched=$(xargs -a /tmp/cached -n1 basename | grep -cxFf /tmp/keep || true)
+          echo "$matched of $(wc -l < /tmp/cached) cached RPMs are in the image"
+          if [ "$matched" -lt $(( $(wc -l < /tmp/keep) / 2 )) ]; then
+            echo "::warning::RPM cache names don't match the image's packages; not pruning"
+            exit 0
+          fi
+          while read -r f; do
+            grep -qxF "$(basename "$f")" /tmp/keep || { echo "pruning $(basename "$f")"; rm -f "$f"; }
+          done < /tmp/cached
+          echo "$(find /var/tmp/buildah-cache-0 -name '*.rpm' | wc -l) RPMs, $(du -sh /var/tmp/buildah-cache-0 | cut -f1)"
 
       - name: Save RPM cache
         uses: actions/cache/save@v4
