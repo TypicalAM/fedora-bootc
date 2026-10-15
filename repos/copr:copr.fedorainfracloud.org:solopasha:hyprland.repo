@@ -1,0 +1,14 @@
+# solopasha/hyprland has follow_fedora_branching disabled, so it only ever carries a
+# fedora-rawhide chroot; the fedora-44 one vanished when F44 branched off rawhide.
+# The rawhide chroot still holds the fc44-tagged builds (hyprpaper), so point at it
+# explicitly until the project ships an F44 chroot. Same fix as in tygrys20.
+[copr:copr.fedorainfracloud.org:solopasha:hyprland]
+name=Copr repo for hyprland owned by solopasha
+baseurl=https://download.copr.fedorainfracloud.org/results/solopasha/hyprland/fedora-rawhide-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/solopasha/hyprland/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
