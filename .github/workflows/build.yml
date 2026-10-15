@@ -59,6 +59,22 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "date=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
 
+      # rpm-ostree keeps repo metadata and downloaded RPMs in the Containerfile's
+      # bootc-base-image-cache mount, which rootful buildah stores here. Carry
+      # it between runs so only new/updated packages are downloaded.
+      - name: Install zstd for cache compression
+        run: dnf -y install zstd
+
+      - name: Restore RPM cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /var/tmp/buildah-cache-0
+          key: rpm-cache-${{ github.run_id }}
+          restore-keys: rpm-cache-
+
+      - name: RPM cache size before build
+        run: du -sh /var/tmp/buildah-cache-0 2>/dev/null || echo "no cache"
+
       - name: Build chunked image
         run: |
           podman build \
@@ -71,6 +87,18 @@ jobs:
             -t "$IMAGE:${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.date }}" \
             -t "$IMAGE:latest" \
             .
+
+      - name: RPM cache size after build
+        run: |
+          du -sh /var/tmp/buildah-cache-0
+          find /var/tmp/buildah-cache-0 -maxdepth 4 -type d | head -40
+          find /var/tmp/buildah-cache-0 -name '*.rpm' | wc -l
+
+      - name: Save RPM cache
+        uses: actions/cache/save@v4
+        with:
+          path: /var/tmp/buildah-cache-0
+          key: rpm-cache-${{ github.run_id }}
 
       - name: Lint image
         run: podman run --rm "$IMAGE:${{ steps.meta.outputs.version }}" bootc container lint
